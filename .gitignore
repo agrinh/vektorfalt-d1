@@ -3,6 +3,9 @@
 ## We have git for backups!
 ##---------------------------------------------------
 
+# Vim swp file
+.*.swp
+
 # Windows default autosave extension
 *.asv
 
