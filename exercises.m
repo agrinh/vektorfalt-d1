@@ -1,11 +1,11 @@
 %% Exercise 1a
 % constants
 G = 6.673E-11;  % the gravitational constant
-d = 7E5;  % distance between start
+d = 7E8;  % distance between stars
 ms = 1.989E30;  % sun mass
 m1 = 1;  % ammount of sunmasses of star 1
 m2 = 0.4;  % ammount of sunmasses of star 2
-levels = -linspace(1, 14E4, 70).^3.1;  % levels for contours
+levels = -[5E11 0.01*exp(linspace(0, 42, 70))];  % levels for contours
 
 
 % calculate position of stars
@@ -21,7 +21,8 @@ x = linspace(-1.5*d, 1.5*d, 1e3);
 [X, Y] = meshgrid(x, x);
 
 % calculate the potential on the plane
-PHI = arrayfun(@(x, y) potential([x y 0], r1, r2, m1*ms, m2*ms, G), X, Y);
+w = angular_velocity(r1, r2, m1*ms, m2*ms, G);
+PHI = arrayfun(@(x, y) potential([x y 0], r1, r2, m1*ms, m2*ms, w, G), X, Y);
 
 % plot
 figure();
@@ -30,18 +31,23 @@ daspect(ones(1, 3));
 
 %% Exercise 1b
 % run 1A first
-step = 100;
+step = 46;
 sub = @(M) M(1:step:end, 1:step:end);
-[FX,FY] = gradient(-sub(PHI));
+[FX,FY] = gradient(sub(PHI));
 hold on;
-quiver(sub(X), sub(Y), FX, FY);
+quiver(sub(X), sub(Y), -5E-4*FX, -5E-4*FY, 1);
 hold off;
 
 %% Exercise 2 - setup
-J = 0.2;  % vortex strength
+J = 2;  % vortex strength
 x0 = 10;  % vortex positions at x = +/- x0
-r_start = [20, -1];  % start position for fieldline
-t_span = [0, 5000];  % iterations for generating fieldline
+colors = ['r', 'g', 'y', 'k', 'm'];  % colors for fieldlines
+r_start = [2,  -1;
+           4,  -1;
+           18, -1;
+           20, -1;
+           -20,-1];  % start positions for fieldlines
+t_span = [0, 500];  % iterations for generating fieldline
 
 % space to plot vortex in
 x = linspace(-20, 20, 15);
@@ -51,24 +57,24 @@ x = linspace(-20, 20, 15);
 % run setup first
 [UX, UY] = fluid_velocity_a(X, Y, J, x0);
 packed_fluid = repack(@fluid_velocity_a, true);
-[~, x] = ode15s(@(t, r)packed_fluid(r(1), r(2), J, x0), ...
-                t_span, ...
-                r_start);
 
 %% Excercise 2b
 % run setup first
 [UX, UY] = fluid_velocity_b(X, Y, J, x0);
 packed_fluid = repack(@fluid_velocity_b, true);
-[~, x] = ode15s(@(t, r)packed_fluid(r(1), r(2), J, x0), ...
-                t_span, ...
-                r_start);
 
 %% Exercise 2 - plot
 % run setup and a part subexercise first
 figure();
 quiver(X, Y, UX, UY);
 hold on;
-plot(x(:, 1), x(:, 2), 'r');
-plot(x(1, 1), x(1, 2), 'or', 'MarkerSize', 20);
-plot(x(end, 1), x(end, 2), 'xr', 'MarkerSize', 20);
+for i = 1:size(r_start, 1)
+    color = colors(1 + mod(i, length(colors)));
+    [~, x] = ode15s(@(t, r)packed_fluid(r(1), r(2), J, x0), ...
+                    t_span, ...
+                    r_start(i, :));
+    plot(x(:, 1), x(:, 2), color);
+    plot(x(1, 1), x(1, 2), ['o' color], 'MarkerSize', 20);
+    plot(x(end, 1), x(end, 2), ['x' color], 'MarkerSize', 20);
+end
 hold off;
