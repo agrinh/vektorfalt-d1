@@ -1,0 +1,128 @@
+\documentclass[12pt,a4paper]{article}
+\pdfoutput=1
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish]{babel}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{units}
+\usepackage{icomma}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{bbm}
+\newcommand{\N}{\ensuremath{\mathbbm{N}}}
+\newcommand{\Z}{\ensuremath{\mathbbm{Z}}}
+\newcommand{\Q}{\ensuremath{\mathbbm{Q}}}
+\newcommand{\R}{\ensuremath{\mathbbm{R}}}
+\newcommand{\C}{\ensuremath{\mathbbm{C}}}
+\newcommand{\rd}{\ensuremath{\mathrm{d}}}
+\newcommand{\id}{\ensuremath{\,\rd}}
+\usepackage{hyperref}
+\usepackage{subfig}
+\setlength\parindent{0pt}
+
+\begin{document}
+
+\title{Vektorfält Datorinlämning 1}
+\author{Agrin Hilmkil -- agrin@student}
+\date{September 2014}
+\maketitle
+
+\begin{abstract}
+I denna rapport presenteras lösningar för datoruppgift 1 i FFM232 Vektorfält och klassisk fysik. Samtliga lösningar och rapport finns tillgängliga på https://github.com/agrinh/vektorfalt-d1
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Visualisering av ett skalärt fält}
+
+Här visualiseras gravitations potentialen som beskriver två stjärnor med position $r_1$ och $r_2$ relativt masscentrum och med massor $m_1$ respektive $m_2$:
+\begin{equation}
+\phi (\vec{r}) = - \frac{Gm_1}{|\vec{r} - \vec{r_1}|} - \frac{Gm_2}{|\vec{r} - \vec{r_2}|} - \frac{1}{2}(\vec{\omega} \times \vec{r})^2
+\end{equation}
+
+Där $\omega$ ges av:
+\begin{equation}
+\vec{\omega} = \sqrt{\frac{G(m_1 + m_2)}{|\vec{r_1}-\vec{r_2}|}}\ \ \hat{z}
+\end{equation}
+
+Vidare används följande värden:
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c|c}
+ Symbol & Beskrivning & Värde \\
+ \hline
+ $G$ & Newtons gravitationskonstant & $6.673\cdot10^{-11}$ \unit{N$\cdot(\frac{m}{kg})^2$} \\
+ $m_s$ & 1 Solmassa & $1.989\cdot10^{30}$ \unit{kg} \\
+ $d$ & Avstånd mellan stjärnorna & $7\cdot10^{5}$ \unit{km}
+\end{tabular}
+\caption{Värden}
+\label{tab:konstanter}
+\end{table}
+
+Slutligen kan vi enkelt bestämma $r_1$ och $r_2$ relativt masscentrum som sätts till origo genom att placera dessa längs x-axeln, låta den större stjärnan ligga åt negativa x och lösa:
+\begin{equation}
+\begin{array}{lcl}
+x_1 \cdot m_1 + x_2 \cdot m_2 = 0 \\
+|x_1| + |x_2| = d
+\end{array}
+\end{equation}
+
+Där $x_i$ är x komponenten av $r_i$. Vi får då:
+\begin{equation}
+\begin{array}{lcl}
+\vec{r_1} = - \frac{d}{1 + \frac{m_1}{m_2}} \ \hat{x} = -2\cdot10^{5} \ \hat{x} \\
+\vec{r_2} = \frac{m_1}{m_2} |x_1| \ \hat{x} = 5\cdot10^{5} \ \hat{x}
+\end{array}
+\end{equation}
+
+\subsection{Uppgift A}
+Visualiseringen syns i figur \ref{fig:stars}. Då stjärnorna sammanfaller med ekvipotentialytorna ser vi att de för små radier är cirkulära medan de för större radier blir desto mer äggformade mot varandra innan de flyter ihop.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=25em]{full_stars.eps}
+\caption{\label{fig:stars} Nivåytor av gravitationspotentialen}
+\end{figure}
+
+\subsection{Uppgift B}
+Som förväntat ser vi i figur \ref{fig:stars_grad} på gradienten utritad med \texttt{quiver} att en testpartikel med positiv massa dras in mot stjärnorna.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=25em]{full_stars_arrows.eps}
+\caption{\label{fig:stars_grad} Nivåytor av gravitationspotentialen med gradienten utritad}
+\end{figure}
+
+
+\section{Visualisering av ett vektorfält}
+De generarade fältlinjerna för denna uppgift syns i figur \ref{fig:fluid}, där figur a och b är för respektive deluppgift. I båda fallen placeras startpunkter på samma ställen (utom en punkt som flyttades i uppgift a för att undvika överlapp med en annan fältlinje). De konstanter som användes är angivna i tabell \ref{tab:fluid_konstanter}.\\
+
+
+
+Ekvationerna som används är de i uppgiften angivna hastighetsfälten. Dessa löses med \texttt{ode15s} från varje startpunkt och plottas därefter i figuren med olika färger. Vidare ritas även här vektorfältet ut med hjälp av \texttt{quiver} för att tydligaregöra virvlarna.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c|c}
+ Symbol & Värde \\
+ \hline
+ $J$ & $2$ \\
+ $x_0$ & $10$
+\end{tabular}
+\caption{Konstanter för hastighetsfältet}
+\label{tab:fluid_konstanter}
+\end{table}
+
+
+\begin{figure}[!ht]
+    \centering
+    \makebox[\textwidth][c]{
+        \subfloat[]{\includegraphics[width=25em]{fluid_motion_a.eps}}
+        \subfloat[]{\includegraphics[width=25em]{fluid_motion_b.eps}}
+    }
+    \caption{\label{fig:fluid} Fältlinjer i fluid med virvlar. Cirkel markerar startposition för en testpartikel och X dess slutposition.}
+\end{figure}
+
+\end{document}
